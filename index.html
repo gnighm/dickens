@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        .book-item { margin: 10px 0; }
+        .progress-container { width: 100%; background: #eee; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 10px; background: #4caf50; width: 0%; }
+    </style>
+</head>
+<body>
+    <h1>Book List</h1>
+    <div id="book-list"></div>
+    <script>
+        const books = [
+            "bleak-house", "david-copperfield", "dombey-and-son", "great-expectations",
+            "hard-times", "little-dorrit", "martin-chuzzlewit", "nicholas-nickleby",
+            "old-curiosity-shop", "oliver-twist", "our-mutual-friend", "pickwick-papers",
+            "sketches-by-boz", "tale-of-two-cities"
+        ];
+
+        const bookList = document.getElementById("book-list");
+
+        function getOverallProgress() {
+            let totalPages = 0;
+            let totalRead = 0;
+            books.forEach(book => {
+                let bookPages = parseInt(localStorage.getItem(`pages-${book}`)) || 1;
+                let bookProgress = parseInt(localStorage.getItem(`page-${book}`)) || 0;
+                totalPages += bookPages;
+                totalRead += bookProgress;
+            });
+            return totalPages > 0 ? (totalRead / totalPages) * 100 : 0;
+        }
+
+        books.forEach(book => {
+            const progress = parseInt(localStorage.getItem(`page-${book}`)) || 0;
+            const totalPages = parseInt(localStorage.getItem(`pages-${book}`)) || 1;
+            const progressPercent = (progress / totalPages) * 100;
+            
+            const bookItem = document.createElement("div");
+            bookItem.classList.add("book-item");
+            bookItem.innerHTML = `
+                <a href="https://raw.githubusercontent.com/gnighm/dickens/main/dickens-books/${book}.txt">
+                    ${book.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                </a>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                </div>
+            `;
+            bookList.appendChild(bookItem);
+        });
+
+        const overallProgress = getOverallProgress();
+        const overallProgressBar = document.createElement("div");
+        overallProgressBar.innerHTML = `
+            <h2>All Titles Progress</h2>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: ${overallProgress}%"></div>
+            </div>
+        `;
+        document.body.insertBefore(overallProgressBar, bookList);
+    </script>
+</body>
+</html>

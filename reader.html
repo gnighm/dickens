@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Book</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .text-box { height: 400px; overflow-y: scroll; background-color: #f9f9f9; padding: 20px; margin-bottom: 20px; }
+        .progress-container { width: 100%; background: #eee; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 10px; background: #4caf50; width: 0%; }
+    </style>
+</head>
+<body>
+    <h1>Reading Book</h1>
+    <div class="text-box" id="text-box"></div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div>
+        <button id="previous">Previous</button>
+        <button id="next">Next</button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const book = urlParams.get("book");
+        let page = parseInt(localStorage.getItem(`page-${book}`)) || 0;
+
+        const bookUrl = `https://raw.githubusercontent.com/gnighm/dickens/main/dickens-books/${book}.txt`;
+        const textBox = document.getElementById("text-box");
+        const progressBar = document.getElementById("progress-bar");
+
+        fetch(bookUrl)
+            .then(response => response.text())
+            .then(text => {
+                const pages = text.split("\n\n");  // Split by two newlines as page breaks.
+                const totalPages = pages.length;
+                const currentPage = pages[page];
+                textBox.innerText = currentPage;
+
+                const progressPercent = (page / totalPages) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+
+                document.getElementById("previous").onclick = () => {
+                    if (page > 0) {
+                        page--;
+                        localStorage.setItem(`page-${book}`, page);
+                        textBox.innerText = pages[page];
+                        progressBar.style.width = `${(page / totalPages) * 100}%`;
+                    }
+                };
+
+                document.getElementById("next").onclick = () => {
+                    if (page < totalPages - 1) {
+                        page++;
+                        localStorage.setItem(`page-${book}`, page);
+                        textBox.innerText = pages[page];
+                        progressBar.style.width = `${(page / totalPages) * 100}%`;
+                    }
+                };
+            })
+            .catch(error => console.error("Error loading book:", error));
+    </script>
+</body>
+</html>
