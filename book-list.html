@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        .book { margin-bottom: 15px; }
+        .progress-bar-container { width: 100%; background-color: #ccc; }
+        .progress-bar { height: 20px; width: 0%; background-color: #4caf50; text-align: center; color: white; line-height: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Book List</h1>
+    <button onclick="window.location.href='index.html'">Back to Reader</button>
+    
+    <h2>All Titles Progress</h2>
+    <div class="progress-bar-container">
+        <div id="overall-progress-bar" class="progress-bar">0%</div>
+    </div>
+    
+    <div id="book-list"></div>
+    <script>
+        const books = [
+            "Bleak House", "David Copperfield", "Dombey and Son", "Great Expectations", 
+            "Hard Times", "Little Dorrit", "Martin Chuzzlewit", "Nicholas Nickleby", 
+            "The Old Curiosity Shop", "Oliver Twist", "Our Mutual Friend", "The Pickwick Papers", 
+            "Sketches by Boz", "A Tale of Two Cities"
+        ];
+        
+        const bookListDiv = document.getElementById('book-list');
+        const overallProgressBar = document.getElementById('overall-progress-bar');
+        
+        let totalProgress = 0;
+        books.forEach(book => {
+            const bookKey = book.toLowerCase().replace(/ /g, '-');
+            const progress = parseInt(localStorage.getItem(`readingProgress-${bookKey}`) || "0", 10);
+            totalProgress += progress;
+            const progressPercentage = (progress / 100) + "%";
+            
+            const bookDiv = document.createElement('div');
+            bookDiv.classList.add('book');
+            bookDiv.innerHTML = `
+                <strong>${book}</strong>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progressPercentage}">${progressPercentage}</div>
+                </div>
+                <button onclick="window.location.href='index.html?book=${bookKey}'">Read</button>
+            `;
+            
+            bookListDiv.appendChild(bookDiv);
+        });
+        
+        const overallPercentage = Math.round(totalProgress / books.length) + "%";
+        overallProgressBar.style.width = overallPercentage;
+        overallProgressBar.innerText = overallPercentage;
+    </script>
+</body>
+</html>
